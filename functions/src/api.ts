@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin'
 import * as functions from 'firebase-functions'
 import * as express from 'express'
 import * as cors from 'cors'
+import { validate as validateEmail } from 'email-validator'
 
 import { hashString } from './utils'
 
@@ -26,6 +27,16 @@ app.post('/api/auth', async ({ body }, res) => {
 		const { email, password } = body as {
 			email: string
 			password: string
+		}
+		
+		if (!validateEmail(email)) {
+			res.status(400).send('Invalid email')
+			return
+		}
+		
+		if (!password) {
+			res.status(400).send('Your password cannot be empty')
+			return
 		}
 		
 		const passwordHash = hashString(password)
